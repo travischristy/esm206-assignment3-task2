@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = TRUE)
 library(tidyverse)
 library(lubridate)
 ```
@@ -55,10 +55,15 @@ Make sure to `View()` the resulting data frame (remember: run `View()` in the Co
 
 **Note: You should get a warning about one piece dropped. What happens to the name in Row 49, which contains two dashes?
 
+>The warning told us that we lost information "piece" from row 49 which originally had two dashes. The last name was cut from the new database.
+
 ```{r}
 # Your code here: 
 
-
+sw_split_name <- starwars %>% 
+  separate(col = name,
+           into = c("name_1","name_2"),
+           sep = "-")
 ```
 
 #### 1B. Follow me
@@ -92,7 +97,12 @@ Make sure to `View()` the resulting data frame (remember: run `View()` in the Co
 ```{r}
 # Your code here:
 
-
+sw_skin_sep <- starwars %>% 
+  separate(col = skin_color,
+           into = c("skin_1", "skin_2"),
+           sep = ",",
+           extra = "merge",
+           remove = FALSE)
 ```
 
 ### 2. `tidyr::unite()`
@@ -113,7 +123,7 @@ Check the output after running the code.
 mpg_make_model <- mpg %>% # Start with mpg
   unite(col = make_model, # Create a new column called 'make_model'
         c(manufacturer, model), # That combines the manufacturer & model column
-        sep = "HEY!" # Puts "HEY!" between the pieces (default is underscore)
+        sep = "heygirlhey" # Puts "HEY!" between the pieces (default is underscore)
         ) 
 
 # Feel free to try different separators in the `sep = ""` argument above.
@@ -128,6 +138,11 @@ In the code chunk below, starting from the `mpg` data create a new data frame ca
 ```{r}
 # Your code here: 
 
+mpg_model_class <- mpg %>% 
+  unite(col = model_class,
+        c(model, class),
+        sep = "-",
+        remove = FALSE)
 
 ```
 
@@ -158,7 +173,11 @@ In the code chunk below, use `ymd()` to convert a date that you choose in `YYYY-
 ```{r}
 # Your code here: 
 
+ymd("1989-04-21")
 
+ymd("1989/04/21")
+
+ymd(19890421)
 ```
 
 #### 3B. Follow me
@@ -183,6 +202,11 @@ In the code chunk below, create a vector (using `c()`, as above) stored as `some
 ```{r}
 # Your code here: 
 
+some_dates <- c(04211989, 04221999, 04182009)
+some_dates_converted <- mdy(some_dates)
+some_dates_converted
+
+class(some_dates_converted)
 
 ```
 
@@ -227,6 +251,14 @@ Starting from the `lakers` dataset, create a new dataset called `gasol_hookshots
 ```{r}
 # Your code here: 
 
+gasol_hookshots <- lakers %>% 
+  filter(player == "Pau Gasol", type == "hook") %>% 
+  mutate(Date = ymd(date)) %>% 
+  mutate(month = month(Date))
+
+hookshots_by_month_gasol <- gasol_hookshots %>% 
+  count(month)
+  
 
 ```
 
@@ -277,7 +309,10 @@ Note: If you add another condition within `case_when()` that is `TRUE ~ "some th
 ```{r}
 # Your code here: 
 
-
+storms_danger <- storms %>% 
+  mutate(danger = case_when(
+    status == "hurricane" ~ "high",
+    TRUE ~ "moderate"))
 ```
 
 ## 5. Practice version control w/git
